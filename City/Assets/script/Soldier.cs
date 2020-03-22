@@ -8,7 +8,9 @@ public class Soldier : MonoBehaviour
     [Header("Claculo")]
     public float visioRadius;
     public float attackRadius;
+    float time = 2;
     private Vector2 Ptext;
+    private bool TiFrase;
     public ScriptObjectEnemy ScriptTexto;
     public Text Texto;
     public RawImage Img;
@@ -39,7 +41,10 @@ public class Soldier : MonoBehaviour
             gameObject.GetComponent<SpriteRenderer>().flipX = true;
         }
 
-        Collider[] coli = Physics.OverlapBox(transform.position + transform.right, new Vector2(5, 5), Quaternion.identity);
+        if (TiFrase)
+        {
+            time -= Time.deltaTime;
+        }
 
         
     }
@@ -57,34 +62,41 @@ public class Soldier : MonoBehaviour
             //Apunta el ray hacia el player y lo debugea       
             Vector3 forwad = transform.TransformDirection(player.transform.position - transform.position).normalized;
             RaycastHit2D hit = Physics2D.Raycast(transform.position + forwad, forwad, visioRadius); // Si entra el player en el radio crea el ray
-          
+
             if (hit.collider != null) // Comprueba que el el player quien entra en el radio
             {
                 if (hit.collider.tag == "Player")
                 {
                     // Calcula la distancia del radio cuando entra el jugador
-                    rbEne.MovePosition(transform.position + forwad * 4.8f * Time.deltaTime);
+                    rbEne.MovePosition(transform.position + forwad * 4.5f * Time.deltaTime);
                     anim.SetBool("walking", true);
-                   
+
+
                 }
 
-            }
 
-
+            }  
         }
+
         else{
             anim.SetBool("walking", false);
         }
         // Si esta en el radio de ataque, salta un texto
         if (distancia < attackRadius)
-        {
-            Img.transform.position = new Vector2(transform.position.x,transform.position.y + 1.4f);
-            Texto.text = ScriptTexto.frase1;
-            anim.SetBool("walking", false);
+        {              
+                anim.SetBool("walking", false);
+                TiFrase = true;
+                Img.transform.position = new Vector2(transform.position.x, transform.position.y + 1.4f);
+
+            if (time > 1) Texto.text = ScriptTexto.frase1;
+            else Texto.text = ScriptTexto.frase2;
+
         }
         else
         {
             Img.transform.position = Ptext;
+            TiFrase = false;
+            time = 2;
         }
        
 
